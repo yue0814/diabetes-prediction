@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 import catboost
-from catboost import Pool
-from sklearn.preprocessing import scale
 import lightgbm as lgb
 from sklearn.metrics import roc_auc_score
 import time
@@ -16,6 +14,7 @@ import time
 import _data
 from _auc import auc
 import _variables
+import nn
 
 train_data, test_data = _data.data()
 
@@ -85,8 +84,8 @@ cat_model = catboost.CatBoostClassifier(
         eval_metric='F1',
         random_seed=4 * 100 + 6)
 
-# cat_model.fit(train_data[cols], train_data.diabetes, cat_features=cat_feature_inds)
-cat_model.fit(np.concatenate((train_data.as_matrix(cols), conv1[:, 0:20]), axis=1), train_data["diabetes"])
-# roc_auc_score(test_data.diabetes, cat_model.predict_proba(test_data[cols])[:, 1])
+fc1, fc1_test, fc2, fc2_test, fc3, fc3_test, fc4, fc4_test = nn.features()
+
+cat_model.fit(np.concatenate((train_data.as_matrix(cols), fc4), axis=1), train_data["diabetes"])
 roc_auc_score(test_data.diabetes, cat_model.predict_proba(
-    np.concatenate((test_data.as_matrix(cols), conv1_test[:, 0:20]), axis=1))[:, 1])
+    np.concatenate((test_data.as_matrix(cols), fc4_test), axis=1))[:, 1])

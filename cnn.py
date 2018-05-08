@@ -8,10 +8,12 @@ import torch.utils.data
 from sklearn.utils.extmath import softmax
 from sklearn.metrics import roc_auc_score
 import _data
+import cat
 import warnings
 warnings.filterwarnings("ignore")
 
 train_data, test_data = _data.data()
+feature_score = cat.feature_score()
 new_cols = feature_score.iloc[0:18,:]["Feature"]
 trainD = pd.concat([train_data[new_cols], train_data[new_cols]], axis=1).as_matrix()
 trainD = np.concatenate((trainD, fc1), axis=1)

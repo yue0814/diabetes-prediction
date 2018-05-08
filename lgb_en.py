@@ -77,6 +77,8 @@ lr.fit(np.concatenate((train_feat, train_data.as_matrix(cols)),
 preds = lr.predict_proba(np.concatenate((test_feat, test_data.as_matrix(cols)),
                       axis=1))[:, 1]
 roc_auc_score(test_data.diabetes, preds)
+
+
 # ============================== STEP 2 =====================================================
 rus = RandomUnderSampler(random_state=2018, return_indices=True)
 XALL, yALL, idx_resampled = rus.fit_sample(train_data[cols], (train_data["diabetes"] == 1.).astype(int))
