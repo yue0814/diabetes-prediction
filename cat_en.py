@@ -15,6 +15,7 @@ import _data
 from _auc import auc
 import _variables
 import nn
+import cnn
 
 train_data, test_data = _data.data()
 
@@ -85,6 +86,7 @@ cat_model = catboost.CatBoostClassifier(
         random_seed=4 * 100 + 6)
 
 fc1, fc1_test, fc2, fc2_test, fc3, fc3_test, fc4, fc4_test = nn.features()
+conv1, conv1_test, conv2, conv2_test =cnn.features()
 
 cat_model.fit(np.concatenate((train_data.as_matrix(cols), fc4), axis=1), train_data["diabetes"])
 roc_auc_score(test_data.diabetes, cat_model.predict_proba(

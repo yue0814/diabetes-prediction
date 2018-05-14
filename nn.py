@@ -69,6 +69,7 @@ class Net(nn.Module):
         out = self.fc5(out)
         return out
 
+
 def features():
     train_data, test_data = _data.data()
     cols = train_data.columns.values.tolist()
