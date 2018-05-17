@@ -4,17 +4,15 @@ Created on May 3, 2018
 @author: Yue Peng
 """
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import KFold
 import catboost
 import lightgbm as lgb
 from sklearn.metrics import roc_auc_score
-import time
 
 import _data
 from _auc import auc
 import _variables
-import nn
+import dnn
 import cnn
 
 train_data, test_data = _data.data()
@@ -34,7 +32,6 @@ for i, c in enumerate(train_data[cols].columns.values):
         cat_feature_inds.append(i)
 
 print("CV 5-fold train begin...")
-t0 = time.time()
 kf = KFold(n_splits=5, shuffle=True, random_state=2018)
 scores = []
 for i, (train_idx, val_idx) in enumerate(kf.split(train_data)):
@@ -85,9 +82,13 @@ cat_model = catboost.CatBoostClassifier(
         eval_metric='F1',
         random_seed=4 * 100 + 6)
 
-fc1, fc1_test, fc2, fc2_test, fc3, fc3_test, fc4, fc4_test = nn.features()
+fc1, fc1_test, fc2, fc2_test, fc3, fc3_test, fc4, fc4_test = dnn.features()
 conv1, conv1_test, conv2, conv2_test =cnn.features()
 
 cat_model.fit(np.concatenate((train_data.as_matrix(cols), fc4), axis=1), train_data["diabetes"])
-roc_auc_score(test_data.diabetes, cat_model.predict_proba(
-    np.concatenate((test_data.as_matrix(cols), fc4_test), axis=1))[:, 1])
+print("Test auc with fc4 is %.4f" % roc_auc_score(test_data.diabetes, cat_model.predict_proba(
+    np.concatenate((test_data.as_matrix(cols), fc4_test), axis=1))[:, 1]))
+
+cat_model.fit(np.concatenate((train_data.as_matrix(cols), conv1[:, 0:20]), axis=1), train_data["diabetes"])
+print("Test auc with conv1[, 0:20] is %.4f" % roc_auc_score(test_data.diabetes, cat_model.predict_proba(
+    np.concatenate((test_data.as_matrix(cols), conv1_test[:, 0:20]), axis=1))[:, 1]))

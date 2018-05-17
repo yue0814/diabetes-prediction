@@ -9,7 +9,7 @@ from sklearn.utils.extmath import softmax
 from sklearn.metrics import roc_auc_score
 import _data
 import cat
-import nn
+import dnn
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -50,7 +50,7 @@ class CNN(nn.Module):
 def features():
     train_data, test_data = _data.data()
     feature_score = cat.feature_score()
-    fc1, fc1_test, _, _, _, _, _, _ = nn.features()
+    fc1, fc1_test, _, _, _, _, _, _ = dnn.features()
     new_cols = feature_score.iloc[0:18, :]["Feature"]
     trainD = pd.concat([train_data[new_cols], train_data[new_cols]], axis=1).as_matrix()
     trainD = np.concatenate((trainD, fc1), axis=1)
@@ -104,9 +104,6 @@ def features():
 
 
     print('Test Accuracy of the model on the 10000 test images: %d %%' % (100 * correct / total))
-
-    roc_auc_score(test_data["diabetes"], softmax(outputs.detach().numpy())[:, 1])
-
 
     # conv2 feature map
     conv1 = cnn.conv1.forward(Variable(next(iter(data_loader(

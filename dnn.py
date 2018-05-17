@@ -125,8 +125,6 @@ def features():
 
     print('Accuracy of the network on the %d test set: %d %%'
           % (len(test_data), 100 * correct / total))
-    probs = softmax(outputs.detach().numpy())[:, 1]
-    print("AUC of the test set is %.4f" % roc_auc_score(test_data.diabetes, probs))
 
     # feature map
     fc1 = np.matmul(train_data.as_matrix(cols), net.fc1._parameters["weight"].detach().numpy().T)+\
