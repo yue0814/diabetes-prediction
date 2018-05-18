@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.model_selection import KFold
 import catboost
 import lightgbm as lgb
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, roc_curve
 
 import _data
 from _auc import auc
@@ -30,7 +30,7 @@ for i, c in enumerate(train_data[cols].columns.values):
     num_uniques = len(train_data[cols][c].unique())
     if num_uniques < 5:
         cat_feature_inds.append(i)
-
+'''
 print("CV 5-fold train begin...")
 kf = KFold(n_splits=5, shuffle=True, random_state=2018)
 scores = []
@@ -72,7 +72,7 @@ for i, (train_idx, val_idx) in enumerate(kf.split(train_data)):
     scores.append(roc_auc_score(train_target2, cat_model.predict_proba(train_feat2)[:, 1]))
 
 print("The average test auc is {0}".format(np.mean(scores)))
-
+'''
 
 cat_model = catboost.CatBoostClassifier(
         iterations=400,
@@ -92,3 +92,28 @@ print("Test auc with fc4 is %.4f" % roc_auc_score(test_data.diabetes, cat_model.
 cat_model.fit(np.concatenate((train_data.as_matrix(cols), conv1[:, 0:20]), axis=1), train_data["diabetes"])
 print("Test auc with conv1[, 0:20] is %.4f" % roc_auc_score(test_data.diabetes, cat_model.predict_proba(
     np.concatenate((test_data.as_matrix(cols), conv1_test[:, 0:20]), axis=1))[:, 1]))
+
+preds = cat_model.predict_proba(
+    np.concatenate((test_data.as_matrix(cols), conv1_test[:, 0:20]), axis=1))[:, 1]
+
+fpr, tpr, thresholds = roc_curve(test_data.diabetes, preds)
+
+def evaluate_threshold(threshold):
+    global fpr, tpr, thresholds
+    print("The threshold is %.3f" % threshold)
+    print('Sensitivity:', tpr[thresholds > threshold][-1])
+    print('Specificity:', 1 - fpr[thresholds > threshold][-1])
+
+
+def find_cutoff():
+    global thresholds
+    tmp = 0
+    res = 0
+    for i in np.linspace(0., 0.8, 100):
+        youden = tpr[thresholds > i][-1] + 1 - fpr[thresholds > i][-1] - 1
+        if youden > tmp:
+            res = i
+            tmp = youden
+    return res
+
+evaluate_threshold(find_cutoff())

@@ -103,7 +103,7 @@ def features():
         correct += (predicted == labels).sum()
 
 
-    print('Test Accuracy of the model on the 10000 test images: %d %%' % (100 * correct / total))
+    print('Test Accuracy of the model on the %d test images: %d %%' % (len(testD), 100 * correct / total))
 
     # conv2 feature map
     conv1 = cnn.conv1.forward(Variable(next(iter(data_loader(
