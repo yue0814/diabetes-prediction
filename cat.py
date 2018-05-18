@@ -22,7 +22,6 @@ def feature_score():
     # remove label
     cols.remove("diabetes")
 
-
     cat_feature_inds = []
     for i, c in enumerate(train_data[cols].columns.values):
         num_uniques = len(train_data[cols][c].unique())
@@ -54,7 +53,6 @@ def feature_score():
         scores.append(roc_auc_score(train_target2, cat_model.predict_proba(train_feat2)[:, 1]))
 
     print("The average test auc is {0}".format(np.mean(scores)))
-
 
     cat_model = catboost.CatBoostClassifier(
             iterations=400,
